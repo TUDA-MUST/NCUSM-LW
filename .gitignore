@@ -1,0 +1,11 @@
+# Ignore all .asv files
+*.asv
+
+# Ignore all .mat files
+*.mat
+
+# Ignore all .asc files
+*.asc
+
+# Ignore all .zip files
+*.zip
