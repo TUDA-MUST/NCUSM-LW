@@ -1,15 +1,18 @@
-# Code for 'Non-contact Ultrasonic Stress Measurement using Lamb Waves' (Short: NCUSM-LW)
+# Code for Non-contact Ultrasonic Stress Measurement using Lamb Waves (Short: NCUSM-LW)
+
 In this github repository you will find all the code necessary to evaluate the data and plot the figures of the manuscript entitled `Non-contact Ultrasonic Stress Measurement using Lamb Waves`. It is submitted to Journal of Nondestructive Testing and Evaluation. It uses Matlab 2023b (Mathworks)
+
 Find the paper here: [TODO]
 Find the data here: [TODO]
 
 ## Table of Contents
 - [Abstract](#abstract)
-- [Getting Started](#getting started)
-- [Features and File Descriptions](#features and file descriptions)
+- [Getting Started](#getting-started)
+- [Features and File Descriptions](#features-and-file-descriptions)
 - [License](#license)
 
 ## Abstract
+
 Stress measurement is essential in many applications, such as aerospace or construction, and ultrasonic stress measurement systems are removable and non-destructive. Using air-coupled ultrasound has the advantage of being non-contact. 
 In other works, an air-coupled ultrasonic phased array is used to adjust the coupling angle and then measure the stress using the conventional transit-time method. In this work, we investigate using the coupling angle of air-coupled Lamb waves directly to measure normal stress in the specimen.  
 The coupling angle is dependent on the phase velocity, which, in turn, changes with the stress. We model that effect using numerical simulations with the semi-analytical finite element method. Ultrasonic measurements are conducted on foam-filled sandwich panels with two 0.5 mm steel face sheets during full-scale bending tests according to EN 14509:2013. The ultrasonic stress measurement setup consists of an air-coupled phased array for transmission, a MEMS-microphone array for reception, and a laser Doppler vibrometer for reference. We measure the stress via the coupling angle using either the transmit or the receive phased array, and for reference, we measure the stress via the transit-time using the group velocity. 
@@ -17,12 +20,14 @@ The measurement method with the coupling angle method works, both with the trans
 
    
 ## Getting Started
+
 1. Clone the repo.
 2. Replace the dummy folder `data` and its subfolders with the datafolder from here [TODO] (unzipped).
 3. Make sure Matlab 2023b or higher is installed.
 4. Run whatever file you would like.
 
 ## Features and File Descriptions
+
  - The file `a_evaluate_data_of_hydraulic_press.m` will convert the data recorded by the hydraulic press into a more manageable format and saves it - it is prerun and does not need to be run if there are no changes.
  - The file `a_plot_data_of_hydraulic_press.m` will plot Fig. 5 of the manuscript and more figures which are not in the manuscript.
  - The file `b_evaluate_data_of_ultrasonic_system.m` reads all the raw ultrasonic data and calculates coupling angles, transit-times and more and saves it - it is also prerun and does not need to be run fully if there are no changes. However during runtime it plots images of each of the raw ultrasonic data, which is used as Fig. 8, Fig. 9 and Fig. 10 in the manuscript.
