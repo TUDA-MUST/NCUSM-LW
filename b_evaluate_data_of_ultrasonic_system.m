@@ -17,7 +17,7 @@ for fileIdx_adfs = 1:length(FileName_Bases) %loop through the runs
     clear signals_a_ldv_ref
     FileName_Base = FileName_Bases(fileIdx_adfs);
 
-    load(FileName_Base + "_meta.mat","start_timestamp", "script_that_generated_this_data", "outer_Repetition_Names"si)
+    load(FileName_Base + "_meta.mat","start_timestamp", "script_that_generated_this_data", "outer_Repetition_Names")
     TX_RX_file_extensions = ["TX", "RX1"];
     outer_Repetition_Names = 1:1000; %max to check
     for outRepIdx_first = 1:length(outer_Repetition_Names)
