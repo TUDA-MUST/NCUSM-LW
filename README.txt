@@ -22,15 +22,15 @@ The measurement method with the coupling angle method works, both with the trans
 ## Getting Started
 
 1. Clone the repo.
-2. Replace the dummy folder `data` and its subfolders with the datafolder from here [TODO] (unzipped).
+2. Replace the empty folder `data` and its subfolders with the datafolder from here [TODO] (unzip).
 3. Make sure Matlab 2023b or higher is installed.
 4. Run whatever file you would like.
 
 ## Features and File Descriptions
 
- - The file `a_evaluate_data_of_hydraulic_press.m` will convert the data recorded by the hydraulic press into a more manageable format and saves it - it is prerun and does not need to be run if there are no changes.
+ - The file `a_evaluate_data_of_hydraulic_press.m` will convert the data recorded by the hydraulic press into a more manageable format and saves the new format. The new converted file is already contained in the data, so there is no need to run this file unless there are changes to it.
  - The file `a_plot_data_of_hydraulic_press.m` will plot Fig. 5 of the manuscript and more figures which are not in the manuscript.
- - The file `b_evaluate_data_of_ultrasonic_system.m` reads all the raw ultrasonic data and calculates coupling angles, transit-times and more and saves it - it is also prerun and does not need to be run fully if there are no changes. However during runtime it plots images of each of the raw ultrasonic data, which is used as Fig. 8, Fig. 9 and Fig. 10 in the manuscript.
+ - The file `b_evaluate_data_of_ultrasonic_system.m` reads all the raw ultrasonic data and calculates coupling angles, transit-times and more and saves them in a new file. The new converted file is also already contained in the data, so there is no need to run this file fully unless there are changes to it. However during runtime it plots images of each of the raw ultrasonic data, which is used as Fig. 8, Fig. 9 and Fig. 10 in the manuscript.
  - The file `b_plot_raw_data_of_ultrasonic_system.m` plots coupling angles and transit-times in a format that was not included in the manuscript.
  - The file `c_combine_all_measurements.m` uses the data from the simulation, the hydraulic press and the ultrasonic system and plots Fig. 11, Fig. 12 and Fig. 13 and outputs the values for Table 1 in the manuscript. 
  - In the folder `simulation` there are three scripts to plot Fig. 1, Fig. 2 and Fig. 3 in the manuscript.
