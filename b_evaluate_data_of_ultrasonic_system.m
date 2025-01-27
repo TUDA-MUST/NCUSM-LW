@@ -72,8 +72,8 @@ for fileIdx_adfs = 1:length(FileName_Bases) % Iterate through all measurement ru
                     x_tr = y_tr .* 0; % LDV uses a fixed axis
                 else
                     f_s = Fs_array; % Array sampling rate
-                    x_tr = [...]; % Placeholder for actual array coordinates
-                    y_tr = [...];
+                    x_tr=[-0.00643125; -0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;];
+                    y_tr=[-0.03215625;-0.03215625;-0.03215625;-0.03215625;-0.02786875;-0.02786875;-0.02786875;-0.02786875;-0.02358125;-0.02358125;-0.02358125;-0.02358125;    -0.01929375;-0.01929375;-0.01929375;-0.01929375;-0.01500625;-0.01500625;-0.01500625;-0.01500625;-0.01071875;-0.01071875;-0.01071875;-0.01071875;-0.00643125;-0.00643125;-0.00643125;-0.00643125;-0.00214375;-0.00214375;-0.00214375;-0.00214375;0.00214375;0.00214375;0.00214375;0.00214375;0.00643125;0.00643125;0.00643125;0.00643125;0.01071875;0.01071875;0.01071875;0.01071875;0.01500625;0.01500625;0.01500625;0.01500625;0.01929375;0.01929375;0.01929375;0.01929375;0.02358125;0.02358125;0.02358125;0.02358125;0.02786875;0.02786875;0.02786875;0.02786875;0.03215625;0.03215625;0.03215625;0.03215625];
                 end
 
                 % Prepare angular parameters for beamforming
@@ -93,10 +93,12 @@ for fileIdx_adfs = 1:length(FileName_Bases) % Iterate through all measurement ru
                 f_up = 41000; % Upper frequency bound for bandpass filter
                 N_filter = floor(Pulses / f_0 * f_s); % Filter length
 
-                % Define time window for processing Lamb waves
+                % Define time window for processing Lamb waves and the Filter length N
                 if eval_ldv
+                    N = size(LDV_datas,1);
                     time_window_lamb_wave = round(([0.0009 0.0024]) .* f_s);
                 else
+                    N = size(array_samples,1);
                     time_window_lamb_wave = round(([0.0015 0.0024]) .* f_s);
                 end
                 time_window_lamb_wave = time_window_lamb_wave(1):time_window_lamb_wave(2);
@@ -106,6 +108,13 @@ for fileIdx_adfs = 1:length(FileName_Bases) % Iterate through all measurement ru
                 dummy_init_one_number_per_run = zeros(size(LDV_datas, 3), size(LDV_datas, 4), size(LDV_datas, 5));
                 lw_amps_all_ch = dummy_init_one_number_per_run;
                 lw_idxs_all_ch = dummy_init_one_number_per_run;
+                lw_angs = dummy_init_one_number_per_run;
+                lw_angs_time_mean = dummy_init_one_number_per_run;
+                tt_corr = NaN(size(LDV_datas,3),size(LDV_datas,4), size(LDV_datas,5));
+                tt_thres = tt_corr;
+                Timestamps_inner =  zeros(size(LDV_datas,4), size(LDV_datas,5)); %same as dummy, but without angles
+                Timestamps_std_inner = Timestamps_inner;
+                lin_axIdx = 1;%for future use
 
                 % Process raw data for time and amplitude analysis
                 for outRepIdx_old = 1:length(outer_Repetition_Names_old)
@@ -349,7 +358,7 @@ for fileIdx_adfs = 1:length(FileName_Bases) % Iterate through all measurement ru
     end
 
     %% save the extracted data from all of the measurements
-    save(FileName_Base + "IFSWeval.mat", "outer_Repetition_Names", "outer_Repetition_Names_old", "inner_Repetition_Names","linAx_x","eval_array_n", "TX_RX_file_extensions", "TX_coup_angles","TX_c_std_all", "RX_coup_angles", "Timestamps", "Timestamps_std", "Temperatures", "Temperatures_std", "RX_max_idxs", "tt_corr_times", "tt_thres_times")
+    %save(FileName_Base + "IFSWeval.mat", "outer_Repetition_Names", "outer_Repetition_Names_old", "inner_Repetition_Names","linAx_x","eval_array_n", "TX_RX_file_extensions", "TX_coup_angles","TX_c_std_all", "RX_coup_angles", "Timestamps", "Timestamps_std", "Temperatures", "Temperatures_std", "RX_max_idxs", "tt_corr_times", "tt_thres_times")
 
 
 end
