@@ -15,9 +15,9 @@ filename_here = filename;
 data = readtable(folder+filename_here, 'FileType', 'text', 'Delimiter', '\t', 'HeaderLines', 37);
 
 
-% The columns of the data array correspond to:
+% The columns of the data array correspond to: (Sorry for the German - its inherent for the measurement unit.)
 % Column 1: Time (s)
-% Column 2: Zylinder-Kraft_150KN_GTM_Dose (kN)
+% Column 2: Zylinder-Kraft_150KN_GTM_Dose (kN) 
 % Column 3: Zylinderweg_600mm (mm)
 % Column 4: W1_Hof_IL-300 (mm)
 % Column 5: W2_Mensa_IL-300 (mm)
