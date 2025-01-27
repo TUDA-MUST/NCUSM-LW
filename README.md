@@ -13,10 +13,10 @@ Find the data here: https://tudatalib.ulb.tu-darmstadt.de/handle/tudatalib/4444 
 
 ## Abstract
 
-Stress measurement is essential in many applications, such as aerospace or construction, and ultrasonic stress measurement systems are removable and non-destructive. Using air-coupled ultrasound has the advantage of being non-contact. 
+Stress measurement is essential in many applications such as aerospace or construction, and ultrasonic stress measurement systems are removable and non-destructive. Using air-coupled ultrasound has the advantage of being non-contact. 
 In other works, an air-coupled ultrasonic phased array is used to adjust the coupling angle and then measure the stress using the conventional transit-time method. In this work, we investigate using the coupling angle of air-coupled Lamb waves directly to measure normal stress in the specimen.  
 The coupling angle is dependent on the phase velocity, which, in turn, changes with the stress. We model that effect using numerical simulations with the semi-analytical finite element method. Ultrasonic measurements are conducted on foam-filled sandwich panels with two 0.5 mm steel face sheets during full-scale bending tests according to EN 14509:2013. The ultrasonic stress measurement setup consists of an air-coupled phased array for transmission, a MEMS-microphone array for reception, and a laser Doppler vibrometer for reference. We measure the stress via the coupling angle using either the transmit or the receive phased array, and for reference, we measure the stress via the transit-time using the group velocity. 
-The measurement method with the coupling angle method works, both with the transmit or the receive array, with a repeatability of 5.3 MPa and 4.1 MPa, respectively. The transit-time measurement performs better than the coupling angle method with a repeatability of 2.1 MPa since time measurement is more accurate. However, the coupling angle methods measures phase velocity instead of group velocity. Therefore, both methods can be advantageously combined.
+The measurement method with the coupling angle method works, both with the transmit or the receive array, with a repeatability of 5.3 MPa and 4.1 MPa, respectively, in the range of 0 to 150 MPa. The transit-time measurement performs better than the coupling angle method with a repeatability of 2.1 MPa since time measurement is more accurate. However, the coupling angle methods measures phase velocity instead of group velocity. Therefore, both methods can be advantageously combined.
 
    
 ## Getting Started
