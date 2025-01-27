@@ -3,7 +3,7 @@
 In this github repository you will find all the code necessary to evaluate the data and plot the figures of the manuscript entitled `Non-contact Ultrasonic Stress Measurement using Lamb Waves`. It is submitted to Journal of Nondestructive Testing and Evaluation. It uses Matlab 2023b (Mathworks) or higher.
 
 Find the paper here: [TODO]
-Find the data here: [TODO]
+Find the data here: https://tudatalib.ulb.tu-darmstadt.de/handle/tudatalib/4444 DOI: https://doi.org/10.48328/tudatalib-1654
 
 ## Table of Contents
 - [Abstract](#abstract)
