@@ -1,25 +1,27 @@
 clear all
-% Warning: This script might take many many hours to run. All the
-% evaluation results are already finished and in the dataset.
-% If you only want to see the plots, then just run until you got the
-% desired plot.
-do_plot = true; %deactivate plots with "do_plot = false;" for higher performance
+% Warning: This script might take many hours to run. Evaluation results are already saved in the dataset.
+% To view only the plots, execute the script until the desired plot is generated.
 
-addpath("functions")
+do_plot = true; % Set to false to disable plots and improve performance
 
-%four files for four different runs of the hydraulic press
+addpath("functions") % Add the directory containing helper functions
+
+% Four files corresponding to different runs of a hydraulic press
 FileName_Bases(1) = "data\us_data\2024-11-19-IFSW_zwei_vent_top1";
 FileName_Bases(2) = "data\us_data\2024-11-19-IFSW_zwei_vent_top2";
 FileName_Bases(3) = "data\us_data\2024-11-19-IFSW_zwei_vent_top3";
 FileName_Bases(4) = "data\us_data\2024-11-19-IFSW_zwei_vent_top4";
 
-for fileIdx_adfs = 1:length(FileName_Bases) %loop through the runs
-    clear signals_a_ldv_ref
+for fileIdx_adfs = 1:length(FileName_Bases) % Iterate through all measurement runs
+    clear signals_a_ldv_ref % Clear reference signals to avoid interference between runs
     FileName_Base = FileName_Bases(fileIdx_adfs);
 
-    load(FileName_Base + "_meta.mat","start_timestamp", "script_that_generated_this_data", "outer_Repetition_Names")
+    % Load metadata for the current run
+    load(FileName_Base + "_meta.mat", "start_timestamp", "script_that_generated_this_data", "outer_Repetition_Names")
+
+    % Determine the number of valid repetition files
     TX_RX_file_extensions = ["TX", "RX1"];
-    outer_Repetition_Names = 1:1000; %max to check
+    outer_Repetition_Names = 1:1000; % Check up to 1000 repetitions
     for outRepIdx_first = 1:length(outer_Repetition_Names)
         if ~isfile(FileName_Base + string(outer_Repetition_Names(outRepIdx_first)) + TX_RX_file_extensions(1) + ".mat")
             highest_number = outRepIdx_first;
@@ -27,18 +29,16 @@ for fileIdx_adfs = 1:length(FileName_Bases) %loop through the runs
         end
     end
     outer_Repetition_Names = 1:(outRepIdx_first-1);
-    save(FileName_Base + "_meta.mat", "start_timestamp", "script_that_generated_this_data", "outer_Repetition_Names", '-v7.3' )
+    save(FileName_Base + "_meta.mat", "start_timestamp", "script_that_generated_this_data", "outer_Repetition_Names", '-v7.3')
 
+    %% Initialize arrays for data storage
+    outer_Repetition_Names_old  = 1; % Compatibility with previous datasets
+    inner_Repetition_Names = 1:5; % Number of repetitions per outer cycle
+    linAx_x = 1; linAx_x_idx = 1; % Placeholder for future use
+    eval_array_n = 0:1; % Sweep parameter for evaluations
 
-    %% Init the Arrays for the data
-    outer_Repetition_Names_old  = 1;
-    inner_Repetition_Names = 1:5;
-    linAx_x = 1;linAx_x_idx=1;%future use
-    eval_array_n = 0:1;
-    TX_RX_file_extensions = ["TX", "RX1"];
-
-
-    TX_coup_angles = NaN(length(inner_Repetition_Names), length(outer_Repetition_Names_old), length(outer_Repetition_Names), length(eval_array_n), length(linAx_x), length(TX_RX_file_extensions)); %linAx_x is for future use
+    % Arrays for storing measurement data
+    TX_coup_angles = NaN(length(inner_Repetition_Names), length(outer_Repetition_Names_old), length(outer_Repetition_Names), length(eval_array_n), length(linAx_x), length(TX_RX_file_extensions));
     TX_c_std_all = TX_coup_angles;
     RX_coup_angles = TX_coup_angles;
     tt_corr_times = TX_coup_angles;
@@ -46,91 +46,75 @@ for fileIdx_adfs = 1:length(FileName_Bases) %loop through the runs
     RX_max_idxs = TX_coup_angles;
     Timestamps = TX_coup_angles;
     Timestamps_std = TX_coup_angles;
-    Temperatures = NaN(length(outer_Repetition_Names), length(eval_array_n), length(TX_RX_file_extensions)); %linAx_x is for future use
+    Temperatures = NaN(length(outer_Repetition_Names), length(eval_array_n), length(TX_RX_file_extensions));
     Temperatures_std = Temperatures;
 
-    %paramteres that are sweeped:
-    % TX_RX_file_extensions = ["TX", "RX1"]; TX_RX_idx
-    % eval_ldv = ~eval_array;
-    % angleIdx = 1:length(array_angles)
-
-    %% Start to loop through all the measurement points
-    %%TODO for new files: set the time windows manually, set eval_array, set
-    %%File, set phi - was already done in this case.
+    % Start looping through all measurement points
     for outRepIdx = 1:length(outer_Repetition_Names)
         for TX_RX_idx = 1:length(TX_RX_file_extensions)
 
-            load(FileName_Base + string(outer_Repetition_Names(outRepIdx)) + TX_RX_file_extensions(TX_RX_idx) + ".mat", "array_samples", "LDV_datas", "linAx_positions_x", "array_angles","inner_Repetition_Names", "N_averages", "Fs_LDV", "Fs_array", "acquisition_time_s", "N_Samples_cutoff", "using_rec_array","using_LDV","using_arduino_env", "meas_timestamps", "pressures", "humidities", "temperatures", "creation_date")
-
+            % Load raw data for each measurement
+            load(FileName_Base + string(outer_Repetition_Names(outRepIdx)) + TX_RX_file_extensions(TX_RX_idx) + ".mat", "array_samples", "LDV_datas", "linAx_positions_x", "array_angles", "inner_Repetition_Names", "N_averages", "Fs_LDV", "Fs_array", "acquisition_time_s", "N_Samples_cutoff", "using_rec_array", "using_LDV", "using_arduino_env", "meas_timestamps", "pressures", "humidities", "temperatures", "creation_date")
 
             for eval_array_idx = 1:length(eval_array_n)
-                eval_array = logical(eval_array_n(eval_array_idx));
-                eval_ldv = ~eval_array;
+                eval_array = logical(eval_array_n(eval_array_idx)); % Evaluate array-based signals
+                eval_ldv = ~eval_array; % Evaluate LDV-based signals
 
-                f_0 = 40000; %signal frequency
-                c = 343; %speed of sound
-                lambda = c/f_0; %wavelength
+                % Define signal parameters
+                f_0 = 40000; % Signal frequency (Hz)
+                c = 343; % Speed of sound (m/s)
+                lambda = c/f_0; % Wavelength (m)
+
+                % Set sampling rate and measurement coordinates
                 if eval_ldv
-                    f_s = Fs_LDV;
-                    y_tr= linAx_positions_x'./1000./1.61;
-                    x_tr=y_tr.*0;
+                    f_s = Fs_LDV; % LDV sampling rate
+                    y_tr = linAx_positions_x' ./ 1000 ./ 1.61; % Normalize positions
+                    x_tr = y_tr .* 0; % LDV uses a fixed axis
                 else
-                    f_s = Fs_array; % sample rate
-                    x_tr=[-0.00643125; -0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;    -0.00643125;-0.00214375;0.00214375;0.00643125;];
-                    y_tr=[-0.03215625;-0.03215625;-0.03215625;-0.03215625;-0.02786875;-0.02786875;-0.02786875;-0.02786875;-0.02358125;-0.02358125;-0.02358125;-0.02358125;    -0.01929375;-0.01929375;-0.01929375;-0.01929375;-0.01500625;-0.01500625;-0.01500625;-0.01500625;-0.01071875;-0.01071875;-0.01071875;-0.01071875;-0.00643125;-0.00643125;-0.00643125;-0.00643125;-0.00214375;-0.00214375;-0.00214375;-0.00214375;0.00214375;0.00214375;0.00214375;0.00214375;0.00643125;0.00643125;0.00643125;0.00643125;0.01071875;0.01071875;0.01071875;0.01071875;0.01500625;0.01500625;0.01500625;0.01500625;0.01929375;0.01929375;0.01929375;0.01929375;0.02358125;0.02358125;0.02358125;0.02358125;0.02786875;0.02786875;0.02786875;0.02786875;0.03215625;0.03215625;0.03215625;0.03215625];
+                    f_s = Fs_array; % Array sampling rate
+                    x_tr = [...]; % Placeholder for actual array coordinates
+                    y_tr = [...];
                 end
 
-                %figure(12), scatter3(x_tr,y_tr,1:length(x_tr), 'x'), xlabel("X"), ylabel("Y"), zlabel("IDX"), view(0,90)
-                theta=0:88:88;
-                if length(array_angles)>1
-                    phi=[57,0];
+                % Prepare angular parameters for beamforming
+                theta = 0:88:88; % Horizontal angles
+                if length(array_angles) > 1
+                    phi = [57, 0]; % Vertical angles for array
                 else
-                    phi=-90:0.025:90;
+                    phi = -90:0.025:90; % Fine angular resolution
                 end
-                [theta_mesh, phi_mesh] = meshgrid(theta, phi); % create each angle pair
-                theta_m = theta_mesh(:).'; % flatten 2D array to 1D vector and transpose
-                phi_m = phi_mesh(:).'; % flatten 2D array to 1D vector and transpose
+                [theta_mesh, phi_mesh] = meshgrid(theta, phi); % Generate angle pairs
+                theta_m = theta_mesh(:).'; % Flatten angle arrays
+                phi_m = phi_mesh(:).';
 
-                K_theta = length(theta); %number of horizontal angles
-                K_phi = length(phi); %number of vertical angles
+                % Define filtering and processing parameters
+                Pulses = 20; % Number of pulses in the signal
+                f_lo = 39000; % Lower frequency bound for bandpass filter
+                f_up = 41000; % Upper frequency bound for bandpass filter
+                N_filter = floor(Pulses / f_0 * f_s); % Filter length
 
-                %%
-
-                Pulses=20;
-                f_lo=39000;
-                f_up=41000;
-                N_filter=floor(Pulses/f_0*f_s);
+                % Define time window for processing Lamb waves
                 if eval_ldv
-                    N = size(LDV_datas,1);
-                    time_window_lamb_wave =round(([0.0009 0.0024]).*f_s);
+                    time_window_lamb_wave = round(([0.0009 0.0024]) .* f_s);
                 else
-                    N = size(array_samples,1);
-                    time_window_lamb_wave =round(([0.0015 0.0024]).*f_s);
+                    time_window_lamb_wave = round(([0.0015 0.0024]) .* f_s);
                 end
                 time_window_lamb_wave = time_window_lamb_wave(1):time_window_lamb_wave(2);
-                [~,bpFilter_f] = FilterBP(f_lo, f_up, N_filter, N, f_s);
+                [~, bpFilter_f] = FilterBP(f_lo, f_up, N_filter, N, f_s); % Create bandpass filter
 
-                dummy_init_one_number_per_run = zeros(size(LDV_datas,3),size(LDV_datas,4), size(LDV_datas,5)); %angles, inner, outer_old
-
-                lw_amps_all_ch = dummy_init_one_number_per_run; %für alle kanäle einzeln berechnen
+                % Initialize result arrays for current run
+                dummy_init_one_number_per_run = zeros(size(LDV_datas, 3), size(LDV_datas, 4), size(LDV_datas, 5));
+                lw_amps_all_ch = dummy_init_one_number_per_run;
                 lw_idxs_all_ch = dummy_init_one_number_per_run;
 
-                lw_angs = dummy_init_one_number_per_run;
-                lw_angs_time_mean = dummy_init_one_number_per_run;
-
-                tt_corr = NaN(size(LDV_datas,3),size(LDV_datas,4), size(LDV_datas,5));
-                tt_thres = tt_corr;
-
-                Timestamps_inner =  zeros(size(LDV_datas,4), size(LDV_datas,5)); %same as dummy, but without angles
-                Timestamps_std_inner = Timestamps_inner;
-
-                lin_axIdx = 1;%for future use
-
+                % Process raw data for time and amplitude analysis
                 for outRepIdx_old = 1:length(outer_Repetition_Names_old)
                     for inRepIdx = 1:length(inner_Repetition_Names)
-                        Timestamps_inner(inRepIdx, outRepIdx_old) = mean(meas_timestamps(:,:, inRepIdx,outRepIdx_old), "all"); %first one is linked to lin_ax_idx
-                        Timestamps_std_inner(inRepIdx, outRepIdx_old) = std(meas_timestamps(:,:, inRepIdx,outRepIdx_old),0, "all"); %first one is linked to lin_ax_idx
+                        Timestamps_inner(inRepIdx, outRepIdx_old) = mean(meas_timestamps(:, :, inRepIdx, outRepIdx_old), "all");
+                        Timestamps_std_inner(inRepIdx, outRepIdx_old) = std(meas_timestamps(:, :, inRepIdx, outRepIdx_old), 0, "all");
+						
                         for angleIdx = 1:length(array_angles)
+							% Do a progress report
                             meas_nr = (angleIdx-1) + (inRepIdx-1)*length(array_angles) + (outRepIdx_old-1)*length(array_angles)*length(inner_Repetition_Names);
                             inner_meas_length = length(outer_Repetition_Names_old)*length(array_angles)*length(inner_Repetition_Names);
                             meas_length = 9* (inner_meas_length*length(TX_RX_file_extensions)*length(outer_Repetition_Names));
@@ -138,7 +122,7 @@ for fileIdx_adfs = 1:length(FileName_Bases) %loop through the runs
                             disp("Overall Progress: " + string(100*(outRepIdx*inner_meas_length*length(TX_RX_file_extensions) + TX_RX_idx*inner_meas_length + meas_nr)./meas_length) +"%")
                             
                             %% Process the raw data of each single ultrasonic measurement for time and amplitude. Filter, upsample and envelope extraction first
-                            if eval_ldv
+                            if eval_ldv % use either the LDV signal or the array signal in this loop
                                 signals_real=LDV_datas(:,:,angleIdx, inRepIdx,outRepIdx_old)';
                             else
                                 signals_real=array_samples(:,:,lin_axIdx,angleIdx, inRepIdx,outRepIdx_old)';
@@ -150,27 +134,27 @@ for fileIdx_adfs = 1:length(FileName_Bases) %loop through the runs
                             signals_a_f= signals_a_f.*bpFilter_f;
                             signals_a = ifft(signals_a_f, [], 2);
 
-                            if eval_ldv && TX_RX_file_extensions(TX_RX_idx) == "RX1" %transit-time only with ldv in rx-case - for processing time
-                                %upsamplen:
+                            if eval_ldv && TX_RX_file_extensions(TX_RX_idx) == "RX1" % calculate transit-time only with ldv in rx-case - for processing time
+                                %upsampling:
                                 upsample_factor = 20;
                                 signals_a_up = ifft(signals_a_f, N*upsample_factor, 2);
-                                if ~exist("signals_a_ldv_ref", "var")
+                                if ~exist("signals_a_ldv_ref", "var") % use the first signal as a reference
                                     ref_start_idx = (time_window_lamb_wave(1)-100)*upsample_factor;
                                     ref_end_idx = length(signals_a_up);%(time_window_lamb_wave(end))*upsample_factor;
                                     signals_a_ldv_ref = signals_a_up(ref_start_idx:ref_end_idx);
                                 end
-                                % Matlab correlation time-shift method and insert.
+                                % Matlab correlation time-shift method.
                                 [corr, lags] = xcorr(real(signals_a_ldv_ref), real(signals_a_up));
                                 [~, idx] = max(corr);
                                 time_shift_idx = lags(idx);
                                 tt_corr(angleIdx, inRepIdx, outRepIdx_old) = (-time_shift_idx+1-ref_start_idx)./upsample_factor./f_s;
-
+								
+                                % Threshold method for transit time method
                                 threshold = 0.2;
                                 time_shift_idx_thres = find(real(signals_a_up)>threshold*max(abs(signals_a_up)),1,"first");
                                 tt_thres(angleIdx, inRepIdx, outRepIdx_old) = time_shift_idx_thres./upsample_factor./f_s;
                             end
-                            if eval_array && TX_RX_file_extensions(TX_RX_idx) == "RX1"% beamforming nur mit dem Array im RX fall. Wenn das ldv auch ein array wäre könnte man das hier weglassen.
-                                %upsampling:
+                            if eval_array && TX_RX_file_extensions(TX_RX_idx) == "RX1"% Beamforming only with the array in the RX case
                                 upsample_factor_array = 4;
                                 signals_a_up = ifft(signals_a_f, N*upsample_factor_array, 2);
 
@@ -197,7 +181,7 @@ for fileIdx_adfs = 1:length(FileName_Bases) %loop through the runs
                                 lw_angs(angleIdx, inRepIdx, outRepIdx_old) = best_estimate_for_lw_ang;
                                 lw_angs_time_mean(angleIdx, inRepIdx, outRepIdx_old) = best_estimate_for_lw_ang; %obsolet
                             end
-                            if eval_array && TX_RX_file_extensions(TX_RX_idx) == "TX"
+                            if eval_array && TX_RX_file_extensions(TX_RX_idx) == "TX" % in the TX evaluation case, just calculate the received amplitude of the phased array
                                 upsample_factor_array = 4;
                                 signals_a_up = ifft(signals_a_f, N*upsample_factor_array, 2);
                                 time_window_lamb_wave_upsampled = time_window_lamb_wave(1)*upsample_factor_array:time_window_lamb_wave(end)*upsample_factor_array;
@@ -205,8 +189,8 @@ for fileIdx_adfs = 1:length(FileName_Bases) %loop through the runs
                                 lw_amps_all_ch(angleIdx, inRepIdx, outRepIdx_old) = median(lamb_wave_amplitude);
                                 lw_idxs_all_ch(angleIdx, inRepIdx, outRepIdx_old) = median(lw_idx)/upsample_factor_array;
                             end
-                            if eval_ldv && TX_RX_file_extensions(TX_RX_idx) == "TX"
-                                [lamb_wave_amplitude, lw_idx] = max(abs(signals_a(:,time_window_lamb_wave)), [],2); %ohne beamforming für max-amplitude bei LDV
+                            if eval_ldv && TX_RX_file_extensions(TX_RX_idx) == "TX"% in the TX evaluation case, just calculate the received amplitude of the LDV
+                                [lamb_wave_amplitude, lw_idx] = max(abs(signals_a(:,time_window_lamb_wave)), [],2); %no beamforming
                                 lw_amps_all_ch(angleIdx, inRepIdx, outRepIdx_old) = sum(lamb_wave_amplitude);
                                 lw_idxs_all_ch(angleIdx, inRepIdx, outRepIdx_old) = mean(lw_idx);
                             end
